@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import LoadingSpinner from '../components/LoadingSpinner'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 function AdminDashboardPage() {
   const [stats, setStats] = useState({ totalRegistrations: 0, totalCheckedIn: 0 })
