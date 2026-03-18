@@ -1,0 +1,15 @@
+{
+  "name": "eventx",
+  "version": "1.0.0",
+  "description": "EventX - Full-stack event management application",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "start": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
