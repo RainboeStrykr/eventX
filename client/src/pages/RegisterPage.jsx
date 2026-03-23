@@ -75,6 +75,7 @@ function RegisterPage() {
           participantId: data.participant.participantId,
           fullName: data.participant.fullName,
           qrCode: data.participant.qrCode,
+          whatsappNumber: formData.whatsappNumber.replace(/\s/g, ''),
         },
       })
     } catch (err) {
