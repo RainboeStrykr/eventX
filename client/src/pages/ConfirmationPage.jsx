@@ -47,11 +47,11 @@ function ConfirmationPage() {
     const qrUrl = `${window.location.origin}/api/qr/${participantId}`
 
     const message = encodeURIComponent(
-      `Hello ${fullName},\n\nYour registration for EventX is confirmed! 🎉\n\n` +
-      `📋 *Participant ID:* ${participantId}\n\n` +
-      `🔲 *Your QR Code:*\n${qrUrl}\n\n` +
+      `Hello ${fullName},\n\nYour registration for EventX is confirmed! \n\n` +
+      ` *Participant ID:* ${participantId}\n\n` +
+      ` *Your QR Code:*\n${qrUrl}\n\n` +
       `Tap the link above to view and save your QR code.\n` +
-      `Show it at the entrance for check-in. 🚀`
+      `Show it at the entrance for check-in. `
     )
 
     const waUrl = `https://wa.me/${phone}?text=${message}`
