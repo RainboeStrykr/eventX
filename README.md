@@ -9,7 +9,11 @@ A full-stack event management application with QR code-based check-in system, Wh
 - **QR Code Generation**: Automatic QR code generation for each participant upon registration
 - **QR Code Scanning**: Admin scanner for quick check-in at event venue
 - **WhatsApp Confirmations**: Automated WhatsApp messages via Twilio upon successful registration
-- **Admin Dashboard**: Real-time statistics showing total registrations and check-ins
+- **Admin Dashboard**: Real-time statistics with interactive visualizations
+  - **Data Visualizations**: Pie charts for food preferences, chauffeur status, and guest food preferences
+  - **View Toggle**: Switch between visualization view and detailed table view
+  - **CSV Export**: Download complete participant data as CSV file
+  - **Real-time Stats**: Total registrations, checked-in participants, and pending count
 - **Event-Specific Customization**: Different form fields per event type (e.g., meal selection for marriage events)
 - **Responsive Design**: Mobile-friendly interface for both participants and admins
 
@@ -20,6 +24,7 @@ A full-stack event management application with QR code-based check-in system, Wh
 - **Vite 8** - Build tool and dev server
 - **React Router 7** - Client-side routing
 - **html5-qrcode** - QR code scanning library
+- **Recharts** - Chart library for data visualizations
 - **CSS** - Custom styling with modern design
 
 ### Backend
@@ -81,11 +86,18 @@ A full-stack event management application with QR code-based check-in system, Wh
      - **Invalid QR Code**: QR code not found in database
 
 3. **Admin Dashboard** (`/admin/dashboard`)
-   - Event selection dropdown
-   - Real-time statistics:
-     - Total registrations
-     - Total checked-in participants
-   - Participant list with details
+   - Event selection dropdown at the top
+   - **Visualization View**:
+     - Stat cards: Total registrations, checked-in, pending
+     - Pie charts: Food preferences, chauffeur status, guest food preferences
+   - **Table View**:
+     - Searchable participant list
+     - Filter by guest food preferences (veg/non-veg)
+     - Complete participant details in table format
+   - **Export Features**:
+     - Download participant data as CSV file
+     - Refresh data button
+   - Real-time statistics update
 
 ## Technical Architecture
 
@@ -97,6 +109,7 @@ eventX/
 │   ├── src/
 │   │   ├── components/       # Reusable components
 │   │   │   ├── AdminProtectedRoute.jsx
+│   │   │   ├── DashboardCharts.jsx
 │   │   │   ├── LoadingSpinner.jsx
 │   │   │   └── Navbar.jsx
 │   │   ├── constants/        # Configuration constants
@@ -181,12 +194,18 @@ CREATE TABLE {event_name} (
   - Response: Check-in status, participant details
 
 #### Participants
-- `GET /api/participants?event={eventKey}` - List all participants for an event
+- `GET /api/participants?event={eventKey}&search={query}&food={filter}` - List all participants for an event
+  - Query params: `event` (required), `search` (optional), `food` (optional: veg/non-veg)
   - Response: Array of participant records
+- `GET /api/participants/export?event={eventKey}` - Export participants as CSV
+  - Query params: `event` (required)
+  - Response: CSV file download
 
 #### Statistics
 - `GET /api/stats?event={eventKey}` - Get event statistics
   - Response: `totalRegistrations`, `totalCheckedIn`
+- `GET /api/stats/detailed?event={eventKey}` - Get detailed statistics for visualizations
+  - Response: `totalVegGuests`, `totalNonVegGuests`, `mealPreferences`, `chauffeurStats`
 
 #### QR Code
 - `POST /api/qr` - Generate QR code for a participant ID
