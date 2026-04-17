@@ -6,30 +6,29 @@ function LandingPage() {
   return (
     <div className="landing-page">
       <div className="landing-badge">
-        ✨ Exclusive Event
+        ✨ All in one event management platform
       </div>
 
       <h1 className="landing-title">
-        Welcome to EventX registration
+        Welcome to EventX
       </h1>
 
       <p className="landing-subtitle">
-        Secure your spot at the most anticipated event of the year. 
-        Quick registration, instant QR code, and WhatsApp confirmation.
+        A full-stack event management application with QR code-based check-in system, WhatsApp confirmations, and admin dashboard.      
       </p>
 
       <div className="landing-features">
         <div className="landing-feature">
           <span className="icon">⚡</span>
-          More than 1000+ participants
+          Full-stack application
         </div>
         <div className="landing-feature">
           <span className="icon">📱</span>
-          Hybrid Mode
+          Scanner system for check-ins
         </div>
         <div className="landing-feature">
-          <span className="icon">💬</span>
-          Sponsored by SRMIST
+          <span className="icon">💻</span>
+          Password-protected admin panel
         </div>
       </div>
 
@@ -38,7 +37,7 @@ function LandingPage() {
         className="btn btn-primary btn-lg"
         onClick={() => navigate('/register')}
       >
-        Register for the event →
+        Register for an event →
       </button>
     </div>
   )
