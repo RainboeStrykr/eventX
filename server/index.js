@@ -28,6 +28,25 @@ app.get('/api/events', (req, res) => {
   res.json({ events: listEvents() });
 });
 
+app.post('/api/admin/verify', (req, res) => {
+  const { password } = req.body || {};
+  const adminPassword = process.env.ADMIN;
+
+  if (!adminPassword) {
+    return res.status(500).json({ error: 'Admin password is not configured' });
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  if (password === adminPassword) {
+    return res.json({ success: true });
+  }
+
+  return res.status(401).json({ success: false, error: 'Invalid password' });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

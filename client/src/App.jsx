@@ -6,6 +6,7 @@ import EventRegisterPage from './pages/EventRegisterPage'
 import ConfirmationPage from './pages/ConfirmationPage'
 import AdminScannerPage from './pages/AdminScannerPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminProtectedRoute from './components/AdminProtectedRoute'
 
 function App() {
   return (
@@ -17,8 +18,22 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/:eventKey" element={<EventRegisterPage />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route path="/admin/scanner" element={<AdminScannerPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route
+          path="/admin/scanner"
+          element={(
+            <AdminProtectedRoute>
+              <AdminScannerPage />
+            </AdminProtectedRoute>
+          )}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={(
+            <AdminProtectedRoute>
+              <AdminDashboardPage />
+            </AdminProtectedRoute>
+          )}
+        />
       </Routes>
     </>
   )
