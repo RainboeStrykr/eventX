@@ -11,5 +11,7 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
+      - key: ADMIN
+        sync: false
       - key: PORT
         value: 5000
