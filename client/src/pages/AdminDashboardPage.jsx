@@ -49,6 +49,26 @@ function AdminDashboardPage() {
 
   const pendingCount = stats.totalRegistrations - stats.totalCheckedIn
 
+  const handleDownloadCSV = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/participants/export?event=${selectedEvent}`)
+      if (!res.ok) throw new Error('Failed to download CSV')
+      
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${selectedEvent}_participants_${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      console.error('Download error:', err)
+      alert('Failed to download CSV. Please try again.')
+    }
+  }
+
   return (
     <div className="page-container">
       <div className="dashboard-page">
@@ -115,6 +135,12 @@ function AdminDashboardPage() {
             onClick={fetchData}
           >
             🔄 Refresh
+          </button>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleDownloadCSV}
+          >
+            📥 Download CSV
           </button>
         </div>
 
