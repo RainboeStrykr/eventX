@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { EVENTS } from '../constants/events'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -9,17 +10,19 @@ function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [foodFilter, setFoodFilter] = useState('')
+  const [selectedEvent, setSelectedEvent] = useState(EVENTS[0].key)
 
   const fetchData = async () => {
     setLoading(true)
     try {
       // Fetch stats
-      const statsRes = await fetch(`${API_URL}/api/stats`)
+      const statsRes = await fetch(`${API_URL}/api/stats?event=${selectedEvent}`)
       const statsData = await statsRes.json()
       setStats(statsData)
 
       // Fetch participants with filters
       const params = new URLSearchParams()
+      params.set('event', selectedEvent)
       if (searchQuery) params.set('search', searchQuery)
       if (foodFilter) params.set('food', foodFilter)
 
@@ -42,7 +45,7 @@ function AdminDashboardPage() {
       fetchData()
     }, 400)
     return () => clearTimeout(timeout)
-  }, [searchQuery, foodFilter])
+  }, [searchQuery, foodFilter, selectedEvent])
 
   const pendingCount = stats.totalRegistrations - stats.totalCheckedIn
 
@@ -87,14 +90,25 @@ function AdminDashboardPage() {
             />
           </div>
           <select
+            className="filter-select"
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+          >
+            {EVENTS.map((event) => (
+              <option key={event.key} value={event.key}>
+                {event.label}
+              </option>
+            ))}
+          </select>
+          <select
             id="food-filter"
             className="filter-select"
             value={foodFilter}
             onChange={(e) => setFoodFilter(e.target.value)}
           >
-            <option value="">All Food Preferences</option>
-            <option value="veg">🥗 Vegetarian</option>
-            <option value="non-veg">🍗 Non-Vegetarian</option>
+            <option value="">All Guest Preferences</option>
+            <option value="veg">Has Veg Guests</option>
+            <option value="non-veg">Has Non-veg Guests</option>
           </select>
           <button
             className="btn btn-secondary btn-sm"
@@ -121,7 +135,7 @@ function AdminDashboardPage() {
                   <th>ID</th>
                   <th>WhatsApp</th>
                   <th>Guests</th>
-                  <th>Food</th>
+                  <th>Veg / Non-veg Guests</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -134,11 +148,7 @@ function AdminDashboardPage() {
                     </td>
                     <td>{p.whatsapp_number}</td>
                     <td>{p.num_guests}</td>
-                    <td>
-                      <span className={`badge ${p.food_preference === 'veg' ? 'badge-veg' : 'badge-nonveg'}`}>
-                        {p.food_preference === 'veg' ? '🥗 Veg' : '🍗 Non-Veg'}
-                      </span>
-                    </td>
+                    <td>{p.veg_guests || 0} / {p.non_veg_guests || 0}</td>
                     <td>
                       <span className={`badge ${p.checked_in ? 'badge-success' : 'badge-neutral'}`}>
                         {p.checked_in ? '✅ Checked In' : '⏳ Pending'}

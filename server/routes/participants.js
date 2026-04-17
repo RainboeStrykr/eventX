@@ -1,19 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../supabase');
+const { getEventConfig } = require('../utils/events');
 
 router.get('/', async (req, res) => {
   try {
-    const { food, search } = req.query;
+    const { food, search, event } = req.query;
+    const eventConfig = getEventConfig(event);
+    if (!eventConfig) {
+      return res.status(400).json({ error: 'Invalid event selection' });
+    }
 
     if (supabase) {
       let query = supabase
-        .from('participants')
-        .select('participant_id, full_name, whatsapp_number, email, num_guests, food_preference, special_requests, checked_in, created_at')
+        .from(eventConfig.table)
+        .select('participant_id, full_name, phone_number, whatsapp_number, email, num_guests, veg_guests, non_veg_guests, special_requests, checked_in, created_at')
         .order('created_at', { ascending: false });
 
       if (food && (food === 'veg' || food === 'non-veg')) {
-        query = query.eq('food_preference', food);
+        query = food === 'veg' ? query.gt('veg_guests', 0) : query.gt('non_veg_guests', 0);
       }
 
       if (search) {
@@ -31,10 +36,12 @@ router.get('/', async (req, res) => {
     } else {
       // In-memory fallback
       const registerRoute = require('./register');
-      let store = [...registerRoute.inMemoryStore];
+      let store = registerRoute.inMemoryStore.filter(p => p.event_key === eventConfig.key);
 
       if (food && (food === 'veg' || food === 'non-veg')) {
-        store = store.filter(p => p.food_preference === food);
+        store = food === 'veg'
+          ? store.filter(p => (p.veg_guests || 0) > 0)
+          : store.filter(p => (p.non_veg_guests || 0) > 0);
       }
 
       if (search) {

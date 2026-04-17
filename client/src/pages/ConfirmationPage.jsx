@@ -4,7 +4,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom'
 function ConfirmationPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { participantId, fullName, qrCode, whatsappNumber } = location.state || {}
+  const { participantId, fullName, qrCode, whatsappNumber, eventKey, eventName } = location.state || {}
   const [waLoading, setWaLoading] = useState(false)
   const [waFallback, setWaFallback] = useState(false)
 
@@ -44,10 +44,10 @@ function ConfirmationPage() {
     setWaLoading(true)
     setWaFallback(false)
 
-    const qrUrl = `${window.location.origin}/api/qr/${participantId}`
+    const qrUrl = `${window.location.origin}/api/qr/${participantId}?event=${eventKey || ''}`
 
     const message = encodeURIComponent(
-      `Hello ${fullName},\n\nYour registration for EventX is confirmed! \n\n` +
+      `Hello ${fullName},\n\nYour registration for ${eventName || 'EventX'} is confirmed! \n\n` +
       ` *Participant ID:* ${participantId}\n\n` +
       ` *Your QR Code:*\n${qrUrl}\n\n` +
       `Tap the link above to view and save your QR code.\n` +
@@ -84,6 +84,10 @@ function ConfirmationPage() {
           <div className="info-item">
             <span className="info-label">Name</span>
             <span className="info-value">{fullName}</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Event</span>
+            <span className="info-value">{eventName || 'EventX'}</span>
           </div>
           <div className="info-item">
             <span className="info-label">Participant ID</span>

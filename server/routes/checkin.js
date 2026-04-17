@@ -1,21 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../supabase');
+const { getEventConfig } = require('../utils/events');
 
 router.post('/', async (req, res) => {
   try {
-    const { participantId } = req.body;
+    const { participantId, eventKey } = req.body;
+    const eventConfig = getEventConfig(eventKey);
+
+    if (!eventConfig) {
+      return res.status(400).json({ error: 'Invalid event selection' });
+    }
 
     if (!participantId) {
       return res.status(400).json({ error: 'Participant ID is required' });
     }
+    const normalizedParticipantId = participantId.trim().toUpperCase();
 
     if (supabase) {
       // Look up the participant
       const { data: participant, error: fetchError } = await supabase
-        .from('participants')
+        .from(eventConfig.table)
         .select('*')
-        .eq('participant_id', participantId)
+        .eq('participant_id', normalizedParticipantId)
         .single();
 
       if (fetchError || !participant) {
@@ -29,15 +36,16 @@ router.post('/', async (req, res) => {
           participant: {
             name: participant.full_name,
             participantId: participant.participant_id,
+            eventName: eventConfig.label,
           },
         });
       }
 
       // Mark as checked in
       const { error: updateError } = await supabase
-        .from('participants')
+        .from(eventConfig.table)
         .update({ checked_in: true })
-        .eq('participant_id', participantId);
+        .eq('participant_id', normalizedParticipantId);
 
       if (updateError) {
         return res.status(500).json({ error: 'Failed to update check-in status' });
@@ -50,14 +58,18 @@ router.post('/', async (req, res) => {
           name: participant.full_name,
           participantId: participant.participant_id,
           numGuests: participant.num_guests,
-          foodPreference: participant.food_preference,
+          vegGuests: participant.veg_guests,
+          nonVegGuests: participant.non_veg_guests,
+          eventName: eventConfig.label,
         },
       });
     } else {
       // In-memory fallback
       const registerRoute = require('./register');
       const store = registerRoute.inMemoryStore;
-      const participant = store.find(p => p.participant_id === participantId);
+      const participant = store.find(
+        p => p.participant_id === normalizedParticipantId && p.event_key === eventConfig.key
+      );
 
       if (!participant) {
         return res.status(404).json({ status: 'invalid', message: 'Invalid QR Code' });
@@ -70,6 +82,7 @@ router.post('/', async (req, res) => {
           participant: {
             name: participant.full_name,
             participantId: participant.participant_id,
+            eventName: eventConfig.label,
           },
         });
       }
@@ -83,7 +96,9 @@ router.post('/', async (req, res) => {
           name: participant.full_name,
           participantId: participant.participant_id,
           numGuests: participant.num_guests,
-          foodPreference: participant.food_preference,
+          vegGuests: participant.veg_guests,
+          nonVegGuests: participant.non_veg_guests,
+          eventName: eventConfig.label,
         },
       });
     }

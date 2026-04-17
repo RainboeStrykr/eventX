@@ -1,21 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../supabase');
+const { getEventConfig, resolveEventByParticipantId } = require('../utils/events');
 
 // GET /api/qr/:participantId — returns the QR code as a PNG image
 router.get('/:participantId', async (req, res) => {
   try {
     const { participantId } = req.params;
+    const eventConfig =
+      getEventConfig(req.query.event) || resolveEventByParticipantId(participantId);
 
-    if (!participantId) {
-      return res.status(400).json({ error: 'Participant ID is required' });
+    if (!participantId || !eventConfig) {
+      return res.status(400).json({ error: 'Participant ID and valid event are required' });
     }
 
     let qrDataUrl = null;
 
     if (supabase) {
       const { data, error } = await supabase
-        .from('participants')
+        .from(eventConfig.table)
         .select('qr_code')
         .eq('participant_id', participantId.toUpperCase())
         .single();
@@ -29,7 +32,7 @@ router.get('/:participantId', async (req, res) => {
       // In-memory fallback
       const registerRoute = require('./register');
       const participant = registerRoute.inMemoryStore.find(
-        p => p.participant_id === participantId.toUpperCase()
+        p => p.participant_id === participantId.toUpperCase() && p.event_key === eventConfig.key
       );
       if (!participant) {
         return res.status(404).send('QR code not found');

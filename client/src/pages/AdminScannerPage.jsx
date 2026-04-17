@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
+import { EVENTS } from '../constants/events'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -8,10 +9,20 @@ function AdminScannerPage() {
   const [scanning, setScanning] = useState(false)
   const [loading, setLoading] = useState(false)
   const [manualId, setManualId] = useState('')
+  const [selectedEvent, setSelectedEvent] = useState('')
   const scannerRef = useRef(null)
   const html5QrRef = useRef(null)
 
   const startScanner = async () => {
+    if (!selectedEvent) {
+      setScanResult({
+        type: 'warning',
+        title: 'Select Event First',
+        message: 'Choose Marriage, Reception, or Birthday Party before scanning.',
+      })
+      return
+    }
+
     setScanResult(null)
     setScanning(true)
 
@@ -47,7 +58,7 @@ function AdminScannerPage() {
       try {
         await html5QrRef.current.stop()
         html5QrRef.current.clear()
-      } catch (e) {
+      } catch {
         // ignore
       }
       html5QrRef.current = null
@@ -57,6 +68,15 @@ function AdminScannerPage() {
 
   const handleCheckin = async (participantId) => {
     if (loading) return
+    if (!selectedEvent) {
+      setScanResult({
+        type: 'warning',
+        title: 'Select Event First',
+        message: 'Choose an event before scanning or entering an ID.',
+      })
+      return
+    }
+
     setLoading(true)
     setScanResult(null)
 
@@ -64,7 +84,7 @@ function AdminScannerPage() {
       const res = await fetch(`${API_URL}/api/checkin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participantId }),
+        body: JSON.stringify({ participantId, eventKey: selectedEvent }),
       })
 
       const data = await res.json()
@@ -73,7 +93,7 @@ function AdminScannerPage() {
         setScanResult({
           type: 'error',
           title: '❌ Invalid QR Code',
-          message: `No participant found with ID: ${participantId}`,
+          message: `No ${EVENTS.find((e) => e.key === selectedEvent)?.label || 'event'} participant found with ID: ${participantId}`,
         })
       } else if (data.status === 'already_checked_in') {
         setScanResult({
@@ -85,7 +105,7 @@ function AdminScannerPage() {
         setScanResult({
           type: 'success',
           title: '✅ Entry Allowed',
-          message: `Welcome ${data.participant.name}! ID: ${data.participant.participantId} | Guests: ${data.participant.numGuests} | Food: ${data.participant.foodPreference}`,
+          message: `Welcome ${data.participant.name}! ID: ${data.participant.participantId} | Guests: ${data.participant.numGuests} | Veg/Non-veg: ${data.participant.vegGuests || 0}/${data.participant.nonVegGuests || 0}`,
         })
       } else {
         setScanResult({
@@ -94,7 +114,7 @@ function AdminScannerPage() {
           message: data.error || 'Something went wrong',
         })
       }
-    } catch (err) {
+    } catch {
       setScanResult({
         type: 'error',
         title: 'Connection Error',
@@ -128,6 +148,23 @@ function AdminScannerPage() {
         </div>
 
         <div className="card" style={{ marginBottom: '1.5rem' }}>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label className="form-label" htmlFor="scanner-event-select">Event</label>
+            <select
+              id="scanner-event-select"
+              className="form-select"
+              value={selectedEvent}
+              onChange={(e) => setSelectedEvent(e.target.value)}
+            >
+              <option value="">Select event to scan</option>
+              {EVENTS.map((event) => (
+                <option key={event.key} value={event.key}>
+                  {event.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="scanner-viewport">
             <div id="qr-reader" ref={scannerRef} style={{ width: '100%' }} />
             {!scanning && !scanResult && (
@@ -143,6 +180,7 @@ function AdminScannerPage() {
                 id="start-scanner-btn"
                 className="btn btn-primary"
                 onClick={startScanner}
+                disabled={!selectedEvent}
                 style={{ flex: 1 }}
               >
                 📷 Start Scanner
@@ -170,7 +208,7 @@ function AdminScannerPage() {
               id="manual-id-input"
               type="text"
               className="form-input"
-              placeholder="Enter participant ID (e.g. EVT-ABC123)"
+              placeholder="Enter participant ID (e.g. MAR-ABC123)"
               value={manualId}
               onChange={(e) => setManualId(e.target.value)}
             />
@@ -178,7 +216,7 @@ function AdminScannerPage() {
               id="manual-checkin-btn"
               type="submit"
               className="btn btn-primary btn-sm"
-              disabled={loading || !manualId.trim()}
+              disabled={loading || !manualId.trim() || !selectedEvent}
             >
               {loading ? '...' : 'Check In'}
             </button>

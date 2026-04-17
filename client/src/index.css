@@ -398,6 +398,12 @@ a:hover {
   gap: 1rem;
 }
 
+.event-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 /* ===== Confirmation Page ===== */
 .confirmation-page {
   display: flex;

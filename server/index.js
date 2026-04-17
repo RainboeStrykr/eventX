@@ -9,6 +9,7 @@ const checkinRoute = require('./routes/checkin');
 const participantsRoute = require('./routes/participants');
 const statsRoute = require('./routes/stats');
 const qrRoute = require('./routes/qr');
+const { listEvents } = require('./utils/events');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,9 @@ app.use('/api/checkin', checkinRoute);
 app.use('/api/participants', participantsRoute);
 app.use('/api/stats', statsRoute);
 app.use('/api/qr', qrRoute);
+app.get('/api/events', (req, res) => {
+  res.json({ events: listEvents() });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {

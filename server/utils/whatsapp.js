@@ -2,7 +2,7 @@
  * Send WhatsApp confirmation message via Twilio
  * Gracefully skips if Twilio credentials are not configured
  */
-async function sendWhatsAppConfirmation({ to, participantId, participantName }) {
+async function sendWhatsAppConfirmation({ to, participantId, participantName, eventName }) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_WHATSAPP_FROM;
@@ -18,7 +18,7 @@ async function sendWhatsAppConfirmation({ to, participantId, participantName }) 
     const message = await twilio.messages.create({
       from: from,
       to: `whatsapp:${to}`,
-      body: `🎉 *Registration Confirmed!*\n\nHi ${participantName},\n\nYour registration was successful!\n\n📋 *Participant ID:* ${participantId}\n📅 *Event:* EventX\n📍 *Venue:* TBA\n\nPlease show your QR code at the entrance for check-in.\n\nSee you there! 🚀`,
+      body: `🎉 *Registration Confirmed!*\n\nHi ${participantName},\n\nYour registration was successful!\n\n📋 *Participant ID:* ${participantId}\n📅 *Event:* ${eventName || 'EventX'}\n📍 *Venue:* TBA\n\nPlease show your QR code at the entrance for check-in.\n\nSee you there! 🚀`,
     });
 
     console.log(`✅ WhatsApp message sent: ${message.sid}`);
