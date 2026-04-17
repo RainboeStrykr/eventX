@@ -642,6 +642,62 @@ a:hover {
   color: var(--color-text-muted);
 }
 
+/* ===== Event Selection Bar ===== */
+.event-selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem 1.5rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.event-selection-bar .form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ===== View Toggle Bar ===== */
+.view-toggle-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Charts Grid ===== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.chart-card .no-data {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
 /* ===== Filters ===== */
 .filters-bar {
   display: flex;

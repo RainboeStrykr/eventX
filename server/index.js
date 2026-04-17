@@ -52,14 +52,16 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Serve React frontend in production
-const clientBuildPath = path.join(__dirname, '..', 'client', 'dist');
-app.use(express.static(clientBuildPath));
+// Serve React frontend in production only
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientBuildPath));
 
-// Catch-all: serve index.html for client-side routing
-app.get('/*path', (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
-});
+  // Catch-all: serve index.html for client-side routing
+  app.get('/*path', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`🚀 EventX Server running on http://localhost:${PORT}`);
