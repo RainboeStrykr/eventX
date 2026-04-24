@@ -483,19 +483,6 @@ a:hover {
   height: 200px;
 }
 
-.whatsapp-notice {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: rgba(37, 211, 102, 0.1);
-  border: 1px solid rgba(37, 211, 102, 0.2);
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  color: #25d366;
-  width: 100%;
-}
-
 /* ===== Admin Scanner ===== */
 .scanner-page {
   max-width: 560px;

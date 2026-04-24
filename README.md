@@ -1,6 +1,6 @@
 # EventX
 
-A full-stack event management application with QR code-based check-in system, WhatsApp confirmations, and admin dashboard.
+A full-stack event management application with QR code-based check-in system and admin dashboard.
 
 ## Features
 
@@ -8,7 +8,6 @@ A full-stack event management application with QR code-based check-in system, Wh
 - **Participant Registration**: Comprehensive registration form with meal preferences, guest counts, and special requests
 - **QR Code Generation**: Automatic QR code generation for each participant upon registration
 - **QR Code Scanning**: Admin scanner for quick check-in at event venue
-- **WhatsApp Confirmations**: Automated WhatsApp messages via Twilio upon successful registration
 - **Admin Dashboard**: Real-time statistics with interactive visualizations
   - **Data Visualizations**: Pie charts for food preferences, chauffeur status, and guest food preferences
   - **View Toggle**: Switch between visualization view and detailed table view
@@ -30,7 +29,6 @@ A full-stack event management application with QR code-based check-in system, Wh
 ### Backend
 - **Express 5** - Node.js web framework
 - **Supabase** - PostgreSQL database and client SDK
-- **Twilio** - WhatsApp messaging API
 - **qrcode** - QR code generation library
 - **dotenv** - Environment variable management
 - **cors** - Cross-origin resource sharing
@@ -57,7 +55,7 @@ A full-stack event management application with QR code-based check-in system, Wh
    - Each event has its own registration form
 
 3. **Registration Form** (`/register/:eventKey`)
-   - **Personal Information**: Full name, phone number, WhatsApp number, email
+   - **Personal Information**: Full name, phone number, WhatsApp number (with "same as phone" shortcut), email
    - **Guest Details**: Number of guests, veg/non-veg guest counts
    - **Event-Specific Questions**:
      - Marriage: Meal preference selection (breakfast, lunch, dinner)
@@ -66,10 +64,10 @@ A full-stack event management application with QR code-based check-in system, Wh
    - Form validation with real-time error messages
 
 4. **Confirmation Page** (`/confirmation`)
-   - Displays participant ID
+   - Displays participant ID and event details
    - Shows generated QR code
-   - WhatsApp confirmation message sent automatically
-   - Option to download/save QR code
+   - Download QR code as PNG
+   - Share ticket via WhatsApp (opens `wa.me` link with participant details)
 
 ### Admin Flow
 
@@ -135,8 +133,7 @@ eventX/
 │   │   └── qr.js             # POST /api/qr
 │   ├── utils/               # Utility functions
 │   │   ├── events.js         # Event configuration
-│   │   ├── qr.js            # QR code generation
-│   │   └── whatsapp.js      # WhatsApp messaging
+│   │   └── qr.js            # QR code generation
 │   ├── index.js             # Server entry point
 │   ├── supabase.js          # Supabase client
 │   ├── migration.sql        # Database schema
@@ -233,9 +230,6 @@ Create a `.env` file in the root directory:
 ADMIN=your_admin_password_here
 SUPABASE_URL=your_supabase_url_here
 SUPABASE_SERVICE_KEY=your_supabase_service_key_here
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 PORT=5000
 ```
 
@@ -256,11 +250,11 @@ PORT=5000
 - Scanned using `html5-qrcode` library in admin scanner
 - Contains participant ID for check-in validation
 
-#### WhatsApp Integration
-- Uses Twilio WhatsApp API
-- Sends confirmation message upon successful registration
-- Gracefully handles missing credentials (logs warning instead of error)
-- Non-blocking operation (doesn't delay registration response)
+#### WhatsApp Ticket Sharing
+- Participants provide a WhatsApp number during registration (can match phone number via checkbox)
+- On the confirmation page, a "Send to WhatsApp" button opens a pre-filled `wa.me` link
+- The message includes the participant ID and a link to the QR code
+- No third-party messaging API required — uses WhatsApp's native share URL
 
 #### Fallback Mode
 - If Supabase credentials are not configured, app uses in-memory storage
@@ -279,7 +273,6 @@ PORT=5000
 ### Prerequisites
 - Node.js 18+ installed
 - Supabase account (optional, for persistent storage)
-- Twilio account (optional, for WhatsApp messages)
 
 ### Local Development
 
@@ -347,9 +340,6 @@ The application includes a `render.yaml` configuration for easy deployment:
    - `ADMIN`
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_KEY`
-   - `TWILIO_ACCOUNT_SID` (optional)
-   - `TWILIO_AUTH_TOKEN` (optional)
-   - `TWILIO_WHATSAPP_FROM` (optional)
 
 **Build Process:**
 - Installs root dependencies
@@ -409,11 +399,6 @@ The app works in in-memory mode without Supabase:
 - Ensure HTTPS is used (required for camera access)
 - Check browser camera permissions
 - Use localhost for development (HTTP allowed)
-
-**WhatsApp Messages Not Sending:**
-- Verify Twilio credentials in .env
-- Check Twilio console for message logs
-- Ensure phone number format includes country code
 
 **Database Connection Issues:**
 - Verify Supabase URL and service key

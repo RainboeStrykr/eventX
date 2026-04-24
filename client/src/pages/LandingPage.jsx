@@ -14,7 +14,7 @@ function LandingPage() {
       </h1>
 
       <p className="landing-subtitle">
-        A full-stack event management application with QR code-based check-in system, WhatsApp confirmations, and admin dashboard.      
+        A full-stack event management application with QR code-based check-in system and admin dashboard.      
       </p>
 
       <div className="landing-features">

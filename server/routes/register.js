@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../supabase');
 const { generateQRCode } = require('../utils/qr');
-const { sendWhatsAppConfirmation } = require('../utils/whatsapp');
 const { getEventConfig } = require('../utils/events');
 
 // In-memory fallback when Supabase is not configured
@@ -98,14 +97,6 @@ router.post('/', async (req, res) => {
       participant.created_at = new Date().toISOString();
       inMemoryStore.push(participant);
     }
-
-    // Send WhatsApp confirmation (non-blocking)
-    sendWhatsAppConfirmation({
-      to: whatsappNumber.trim(),
-      participantId,
-      participantName: fullName.trim(),
-      eventName: eventConfig.label,
-    }).catch(err => console.error('WhatsApp error:', err));
 
     res.status(201).json({
       message: 'Registration successful',
