@@ -2,6 +2,8 @@
 
 A full-stack event management application with QR code-based check-in system and admin dashboard.
 
+[Click here for a demo](https://drive.google.com/file/d/1or8lSjyWodZESfisWasbdFm3fEAn27xo/view?usp=sharing)
+
 ## Features
 
 - **Multi-Event Support**: Manage multiple event types (Marriage, Reception, Birthday Party)
